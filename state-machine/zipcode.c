@@ -36,16 +36,15 @@ void destroy_list(struct node *n)
     if (n != NULL)
     {
         destroy_list(n->next);
-        printf("%p %c %u %p\n", n, n->symbol, n->state, n->next);
         free(n);
     }
 }
 
-void destroy_zipcode_afd(struct afd *a)
+void destroy_afd(struct afd *a)
 {
     unsigned int s;
 
-    for (s = 0; s <= 9; s++)
+    for (s = 0; s < a->n; s++)
         destroy_list(a->transitions[s]);
 
     free(a->transitions);
@@ -113,7 +112,7 @@ int main(int argc, char** argv)
 
     create_zipcode_afd(&a);
     printf("%c\n", match_zipcode(argv[1], &a));
-    destroy_zipcode_afd(&a);
+    destroy_afd(&a);
 
     return 0;
 }
