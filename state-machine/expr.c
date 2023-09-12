@@ -50,29 +50,34 @@ void destroy_dfa(struct dfa *a)
     free(a->transitions);
 }
 
-void create_zipcode_dfa(struct dfa *a)
+void create_expr_dfa(struct dfa *a)
 {
     unsigned int s;
-    char i;
-    a->n = 10;
+    char c;
+    a->n = 3;
     a->start = 0;
-    a->final = 9;
+    a->final = 1;
     a->transitions = malloc(a->n * sizeof(struct node *));
 
-    for (s = 0; s <= 9; s++)
+    /*
+     * initializing empty lists
+     */
+    for (s = 0; s < a->n; s++)
         a->transitions[s] = NULL;
 
-    for (s = 0; s <= 4; s++)
-        for (i = '0'; i <= '9'; i++)
-            node_insert(&a->transitions[s], create_node(i, s + 1));
+    for (c = '0'; c <= '9'; c++)
+        node_insert(&a->transitions[0], create_node(c, 1));
 
-    node_insert(&a->transitions[5], create_node('-', 6));
-    for (i = '0'; i <= '9'; i++)
-        node_insert(&a->transitions[5], create_node(i, 7));
+    for (c = '0'; c <= '9'; c++)
+        node_insert(&a->transitions[1], create_node(c, 1));
 
-    for (s = 6; s <= 8; s++)
-        for (i = '0'; i <= '9'; i++)
-            node_insert(&a->transitions[s], create_node(i, s + 1));
+    node_insert(&a->transitions[1], create_node('-', 2));
+    node_insert(&a->transitions[1], create_node('+', 2));
+    node_insert(&a->transitions[1], create_node('/', 2));
+    node_insert(&a->transitions[1], create_node('*', 2));
+
+    for (c = '0'; c <= '9'; c++)
+        node_insert(&a->transitions[2], create_node(c, 1));
 }
 
 char match(char *string, struct dfa *a)
@@ -112,7 +117,7 @@ int main(int argc, char** argv)
 {
     struct dfa a;
 
-    create_zipcode_dfa(&a);
+    create_expr_dfa(&a);
     printf("%c\n", match(argv[1], &a));
     destroy_dfa(&a);
 
