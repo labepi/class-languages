@@ -1,10 +1,16 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define YYSTYPE char *
 
 extern char *yytext;
 extern int yylex(void);
 extern int yyerror(char* s);
+
+unsigned int count = 0;
+char buffer[256];
 %}
 
 %token TK_NUM_INT
@@ -18,18 +24,38 @@ program:
  | expression TK_EOL            { return 0; }
  ;
 
-expression: factor              { $$ = $1; }
- | expression TK_OP_ADD factor  { printf("add %d %d\n", $1, $3); }
- | expression TK_OP_SUB factor  { printf("sub %d %d\n", $1, $3); }
+expression: factor              {  }
+ | expression TK_OP_ADD factor  {
+                                    printf("sum %s %s\n", $1, $3);
+                                    sprintf(buffer, "vr%u", count++);
+                                    printf("store %s\n", buffer);
+                                    $$ = strdup(buffer);
+                                }
+ | expression TK_OP_SUB factor  {
+                                    printf("subtract %s %s\n", $1, $3);
+                                    sprintf(buffer, "vr%u", count++);
+                                    printf("store %s\n", buffer);
+                                    $$ = strdup(buffer);
+                                }
  ;
 
 factor: term                    { $$ = $1; }
- | factor TK_OP_MUL term        { printf("mul %d %d\n", $1, $3); }
- | factor TK_OP_DIV term        { printf("div %d %d\n", $1, $3); }
+ | factor TK_OP_MUL term        {
+                                    printf("muliply %s %s\n", $1, $3);
+                                    sprintf(buffer, "vr%u", count++);
+                                    printf("store %s\n", buffer);
+                                    $$ = strdup(buffer);
+                                }
+ | factor TK_OP_DIV term        {
+                                    printf("divide %s %s\n", $1, $3);
+                                    sprintf(buffer, "vr%u", count++);
+                                    printf("store %s\n", buffer);
+                                    $$ = strdup(buffer);
+                                }
  ;
 
-term: TK_NUM_INT                { $$ = atoi(yytext); }
- | TK_NAME
+term: TK_NUM_INT                { $$ = strdup(yytext); }
+ | TK_NAME                      { $$ = strdup(yytext); }
  ;
 %%
 
